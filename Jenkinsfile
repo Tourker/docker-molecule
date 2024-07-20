@@ -1,31 +1,17 @@
 pipeline {
-  agent {
-    docker {
-      alwaysPull true
-      image 'alainchiasson/docker-molecule:develop'
-      args '--privileged -v /DATA/docker-cache:/docker-cache'
+    agent {
+        label 'ansible'
     }
-  }
-  stages {
-    stage ("Display environment info") {
-      steps {
-        sh 'env'
-      }
+    stages {
+        stage('Build') {
+            steps {
+                sh "git clone 'https://github.com/Tourker/docker-molecule.git'"
+            }
+        }
+        stage('Test role') {
+            steps {
+                sh "cd docker-molecule/simple/ && molecule test"
+            }
+        }
     }
-    stage ("Display Molecule version") {
-      steps {
-        sh 'molecule --version'
-      }
-    }
-    stage ("Validate Docker."){
-      steps {
-        sh 'docker info'
-      }
-    }
-    stage ("Validate Tests Pass."){
-      steps {
-        sh 'cd simple && molecule test'
-      }
-    }
-  }
 }
